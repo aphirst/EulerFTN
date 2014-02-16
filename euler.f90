@@ -25,8 +25,6 @@ contains
     ! The sum of these multiples is 23.
     !
     ! Find the sum of all the multiples of 3 or 5 below 1000.
-    implicit none
-
     integer(i8)              :: limit, N, i
     integer(i8), allocatable :: factors(:), wheel(:), rungsums(:)
     real                     :: time(2)
@@ -62,7 +60,6 @@ contains
     print *, sum(rungsums)
     call cpu_time(time(2))
     print '(a,f0.3,a)', 'Took',time(2)-time(1),' seconds'
-
   end subroutine Problem_1
 
   subroutine Problem_2
@@ -72,8 +69,6 @@ contains
     !
     ! By considering the terms in the Fibonacci sequence whose values do not exceed four million,
     ! find the sum of the even-valued terms.
-    implicit none
-
     integer(i8) :: fibmax, nmax, n
     real        :: time(2)
 
@@ -89,14 +84,11 @@ contains
     print *, sum( [( fib(n), n=3,nmax,3 )] )
     call cpu_time(time(2))
     print '(a,f0.3,a)', 'Took ',time(2)-time(1),' seconds'
-
   end subroutine Problem_2
 
   subroutine Problem_3
     ! The prime factors of 13195 are 5, 7, 13 and 29.
     ! What is the largest prime factor of the number 600851475143 ?
-    implicit none
-
     integer(i8)              :: max_prime, to_factorise, i ! up to 9223372036854775807 for me
     integer(i8), allocatable :: primes(:), wheel(:), factors(:)
     real(dp)                 :: time(2)
@@ -127,15 +119,12 @@ contains
     print '(i0,a)', factors(size(factors)),' ]'
     print '(a,i0)', 'and the largest prime factor is ',factors(size(factors)) ! generated in ascending order
     print '(a,f0.3,a)', 'Took: ',time(2)-time(1),' seconds'
-
   end subroutine Problem_3
 
   subroutine Problem_4
     ! A palindromic number reads the same both ways.
     ! The largest palindrome made from the product of two 2-digit numbers is 9009 = 91 * 99.
     ! Find the largest palindrome made from the product of two 3-digit numbers.
-    implicit none
-
     integer(i8) :: n, half, div, min_div, max_div, current_pal
     real(dp)    :: time(2)
 
@@ -169,14 +158,11 @@ contains
     print *, 'The largest such palindrome is:'
     print '(i0,a,i0,a,i0)', current_pal,' = ',div,' * ',current_pal/div
     print '(a, f0.3, a)', 'Took: ',time(2)-time(1),' seconds'
-
   end subroutine Problem_4
 
   subroutine Problem_5
     ! 2520 is the smallest number that can be divided by each of the numbers from 1 to 10 without any remainder.
     ! What is the smallest positive number that is evenly divisible by all of the numbers from 1 to 20?
-    implicit none
-
     integer(i8)              :: i, limit
     integer(i8), allocatable :: divisors(:)
     real(dp)                 :: time(2)
@@ -190,31 +176,25 @@ contains
     print '(i0)', Lowest_common_multiple( divisors ) ! 232792560
     call cpu_time(time(2))
     print '(a,f0.3,a)', 'Took: ',time(2)-time(1),' seconds'
-
   end subroutine Problem_5
 
   subroutine Problem_6
     ! The difference between the sum of the squares and the square of the sums of the first ten natural numbers is 2640.
     ! Find the difference between the sum of the squares and the square of the sums for the first hundred natural numbers.
-    implicit none
-
     integer(i8) :: n
 
-    print *, 'Problem #6: Find the difference between the sum of the squares and the square of the sums &
-      &for the first <INPUT> natural numbers.'
+    print *, 'Problem #6: Find the difference between the sum of the squares and the square of the sums for the first <INPUT>&
+            & natural numbers.'
     print *, ' '
     print *, 'Upper bound (inclusive)?'
     read *, n
     ! the order here ensures no division rounding, and minimises the chance of integer overflow
     print '(i0)', ( ( (n*(n+1))/2 ) * ( ((n-1)*(3*n + 2))/2 ) ) / 3 ! fails somewhere over N = 50000
-
   end subroutine Problem_6
 
   subroutine Problem_7
     ! By listing the first six prime numbers: 2, 3, 5, 7, 11, and 13, we can see that the 6th prime is 13.
     ! What is the 10001st prime number?
-    implicit none
-
     integer(i8), allocatable :: primes(:)
     integer(i8)              :: n
     real                     :: time(2)
@@ -228,7 +208,6 @@ contains
     call cpu_time(time(2))
     print '(a,i0,a,i0)', 'The ',n,'th prime number is ',primes(n)
     print '(a,f0.3,a)', 'Took: ',time(2)-time(1),' seconds'
-
   end subroutine Problem_7
 
   subroutine Problem_8
@@ -238,8 +217,6 @@ contains
   subroutine Problem_10
     ! The sum of the primes below 10 is 2 + 3 + 5 + 7 = 17.
     ! Find the sum of all the primes below two million.
-    implicit none
-
     integer(i8) :: n, the_sum
     real        :: time(2)
 
@@ -252,19 +229,19 @@ contains
     call cpu_time(time(2))
     print '(a,i0)', 'The sum is ',the_sum
     print '(a,f0.3,a)', 'Time: ',time(2)-time(1),' seconds'
-
   end subroutine Problem_10
 
   subroutine Problem_14
-    implicit none
-
+    ! Which starting number, under one million, produces the longest Collatz chain?
     integer(i8)              :: i, n, max_n, max_length
     integer(i8), allocatable :: lengths(:)
     real(dp)                 :: time(2)
 
-    print *, 'How high?'
+    print *, 'Problem #14: Find the starting number producing the longest Collatz chain, with the start below <INPUT>.'
+    print *, ''
+    print *, 'Upper bound (exclusive)?'
     read *, n
-    lengths = [( 0_i8, i=1,n )]
+    lengths = [( 0_i8, i=1,n-1 )]
     call cpu_time(time(1))
     do i = 1, n
       if (lengths(i) == 0) lengths(i) = Collatz(i,lengths)
@@ -272,10 +249,8 @@ contains
     max_length = maxval(lengths)
     max_n = sum(maxloc(lengths))
     call cpu_time(time(2))
-
     print '(a,i0,a,i0,a)', 'Longest sequence starts at ',max_n,', and is ',max_length,' long.'
     print '(a,f0.3,a)', 'Took: ',time(2) - time(1),' seconds'
-
   end subroutine Problem_14
 
 end module Euler

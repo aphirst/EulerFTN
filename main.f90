@@ -26,30 +26,30 @@ program EulerFTN
   read *, problem
 
   select case (problem)
-    case (0)
-      stop 'Help not yet implemented. Sorry.'
-    case (1)
-      call Problem_1
-    case (2)
-      call Problem_2
-    case (3)
-      call Problem_3
-    case (4)
-      call Problem_4
-    case (5)
-      call Problem_5
-    case (6)
-      call Problem_6
-    case (7)
-      call Problem_7
-    case (8)
-      call Problem_8
-    case (10)
-      call Problem_10
-    case (14)
-      call Problem_14
-    case default
-      stop 'Problem number invalid, or not solved yet.'
+  case (0)
+    stop 'Help not yet implemented. Sorry.'
+  case (1)
+    call Problem_1
+  case (2)
+    call Problem_2
+  case (3)
+    call Problem_3
+  case (4)
+    call Problem_4
+  case (5)
+    call Problem_5
+  case (6)
+    call Problem_6
+  case (7)
+    call Problem_7
+  case (8)
+    call Problem_8
+  case (10)
+    call Problem_10
+  case (14)
+    call Problem_14
+  case default
+    stop 'Problem number invalid, or not solved yet.'
   end select
 
 end program EulerFTN

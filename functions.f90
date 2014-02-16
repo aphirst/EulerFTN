@@ -23,8 +23,6 @@ contains
   pure function Multiples_wheel(factors)
     ! return a 'wheel' of the multiples of 'factors'
     ! TODO: consider adapting this to use the same optimisation as the new Primes_sieve()
-    implicit none
-
     integer(i8), intent(in)              :: factors(:)
     integer(i8),            allocatable  :: multiples_wheel(:)
     integer(i8)                          :: i, N
@@ -40,35 +38,26 @@ contains
     ! create array of integers inside implied do-loop
     ! condense into final array of 'multiples' of 'factors' using IS_MULTIPLE as a mask
     multiples_wheel = pack( [( i, i=1,N )] , is_multiple) ! allocate-on-assigment
-
   end function Multiples_wheel
 
   elemental function Fib(n)
     ! returns the 'n'th Fibonacci number, defined to start as 1, 1, 2, 3 etc.
-    implicit none
-
     integer(i8), intent(in) :: n
     integer(i8)             :: fib
 
     fib = floor( ( varphi**n / sqrt(5.0_dp) ) + 0.5_dp )
-
   end function Fib
 
   elemental function Inv_fib(F)
     ! returns index 'n' of first Fibonacci number BELOW F
-    implicit none
-
     integer(i8), intent(in) :: F
     integer(i8)             :: inv_fib
 
     inv_fib = floor( log( F * sqrt(5.0_dp) ) / log(varphi) )
-
   end function Inv_fib
 
   pure function Old_sieve(limit) result(primes)
     ! returns array of primes up to LIMIT using simple sieve
-    implicit none
-
     integer(i8), intent(in)               :: limit
     integer(i8),              allocatable :: primes(:)
     integer(i8)                           :: i
@@ -83,31 +72,25 @@ contains
     end do
     ! pack an array of all integers into an array of primes using the 'is_prime' mask
     primes = pack( [( i, i=2,limit )] , is_prime(2:) ) ! allocate-on-assignment
-
   end function Old_sieve
 
   pure function Primes_sieve(limit) result(primes)
     ! todo: comment this function, basically uses the optimisation mentioned in the post-solution document for the problem
-    implicit none
-
     integer(i8), intent(in)              :: limit
     integer(i8),             allocatable :: primes(:)
     integer(i8)                          :: i
-    logical,                 allocatable :: is_prime(:)
+    logical(1),              allocatable :: is_prime(:)
 
-    is_prime = [( .true., i = 1, (limit-1)/2 )]
+    is_prime = [( .true._1, i = 1, (limit-1)/2 )]
     do i = 1, ( floor(sqrt( real(limit) )) - 1 ) / 2
-      if (is_prime(i)) is_prime( 2*i*(i+1) :: (2*i)+1 ) = .false.
+      if (is_prime(i)) is_prime( 2*i*(i+1) :: (2*i)+1 ) = .false._1
     end do
     primes = [ 2_i8, pack( [( (2*i)+1, i=1,size(is_prime) )], is_prime ) ]
-
   end function Primes_sieve
 
   pure function Primes_wheel(primes)
     ! return array of potentially-prime spokes for wheel-factorisation of prime-candidate
     ! using an input array of prime numbers 'primes'
-    implicit none
-
     integer(i8), intent(in)              :: primes(:)
     integer(i8),             allocatable :: primes_wheel(:)
     integer(i8)                          :: i, N
@@ -122,28 +105,22 @@ contains
     end do
     ! use the potential_prime mask to pack an array of potential prime, our wheel
     primes_wheel = pack ( [( i, i=1,N )] , potential_prime )
-
   end function Primes_wheel
 
   elemental function Primes_upto(x)
     ! use a standard inequality to return the maximum number of primes less-than or equal to some real 'x'
     ! todo: change x to an integer (n?), if needed (this function hasn't been used yet)
-    implicit none
-
     real(dp),    intent(in) :: x
     integer(i8)             :: primes_upto
 
     ! possibly change this into a more explicit 'if'
     ! the danger is wastefully computing the right-hand expression when we know it will be less than 7
     primes_upto = maxval( [7_i8, int( 1.25506*(x/log(x)) , i8 )] )
-
   end function Primes_upto
 
   elemental function Largest_Pn(n) result(pn)
     ! returns the largest possible candidate for the n'th prime number
     ! for n >= 6
-    implicit none
-
     integer(i8), intent(in) :: n
     integer(i8) :: pn
 
@@ -152,7 +129,6 @@ contains
     else
       pn = int( real(n) * log( real(n) * log(real(n)) ) , i8 )
     end if
-
   end function Largest_Pn
 
   pure function Next_factor(factorising, primes, wheel, prev_factor)
@@ -160,8 +136,6 @@ contains
     ! the output is either the first integer to divide the input, or the input itself if it is prime
     ! for factorising large numbers, the previous factor is an optional input
     ! (since this method generates factors in ascending order)
-    implicit none
-
     integer(i8), intent(in)           :: factorising, primes(:),  wheel(:)
     integer(i8), intent(in), optional :: prev_factor
     integer(i8)                       :: factor_min, factor_max, i, wheel_circ, N_min, N_max, j, spoke, next_factor
@@ -182,10 +156,9 @@ contains
       next_factor = factorising
       return
     end if
-    ! first we want to check if the number we're factorising is divisible by anything
-    ! in the small array of 'primes'
-    if (any(primes >= factor_min)) then
-      do i = count(primes <= factor_min), count( primes <= factor_max )
+    ! first we want to check if the number we're factorising is divisible by anything in the small array of 'primes'
+    if ( factor_min <= primes(size(primes)) ) then
+      do i = count(primes <= factor_min), count(primes <= factor_max)
         if (modulo(factorising, primes(i)) == 0) then
           next_factor = primes(i)
           return
@@ -194,7 +167,7 @@ contains
     end if
     ! next, check if the number divides by anything from the first run of the wheel
     ! done separately so that we can avoid the division by 1
-    if (any(wheel >= factor_min)) then
+    if ( factor_min <= wheel(size(wheel)) ) then
       ! max(2, count) should ensure that wheel(1)=1 is never used with modulo()
       do i = max( 2, count(wheel <= factor_min) ), count(wheel <= factor_max)
         if (modulo(factorising, wheel(i)) == 0) then
@@ -208,7 +181,6 @@ contains
     ! note that this 'circumference' is always 1+maxval(wheel)
     wheel_circ = wheel(size(wheel)) + 1
     ! only for as many extra rungs as it takes to include sqrt(factorising)
-    !
     ! precompute the upper and lower bounds for the additional-rung count using the maximum and minimum possible factors
     N_max = factor_max/wheel_circ ! implicitly floored by integer division
     N_min = max(1_i8, factor_min/wheel_circ) ! ensure the 0th "additional" rung is excluded (i.e. the rung we just did)
@@ -223,14 +195,11 @@ contains
     end do
     ! if we got all the way here, 'factorising' must be prime
     next_factor = factorising
-
   end function Next_factor
 
   pure function Prime_factors(to_factorise, primes, wheel) result(factors)
     ! make use of the 'Next_factor' wheel-factorisation method to return (all of) the
     ! prime factors of an input integer, as an integer array, with the prime factors in ascending order
-    implicit none
-
     integer(i8), intent(in)              :: to_factorise, primes(:), wheel(:)
     integer(i8),             allocatable :: factors(:)
     integer(i8)                          :: factorising
@@ -251,13 +220,10 @@ contains
       factors = [ factors, Next_factor(factorising, primes, wheel, factors( size(factors) )) ]
       factorising = factorising / factors(size(factors))
     end do
-
   end function Prime_factors
 
   elemental function Is_palindrome(num)
     ! determine whether input number is palindromic by converting it into an array
-    implicit none
-
     integer(i8), intent(in)              :: num
     logical                              :: is_palindrome
     integer(i8)                          :: i, n
@@ -271,35 +237,29 @@ contains
     num_array = [( int( modulo(num,10**i)/(10**(i-1)) ), i = 1,n )] ! allocate on assign
     ! use slicing, negative stride, and all() to check either 'half' of the array
     is_palindrome = all( num_array(1:n/2) == num_array(n:1+(n/2):-1) )
-
   end function Is_palindrome
 
   elemental function Palindrome(num)
     ! generates a 2n-digit long palindrome from an n-digit input
     ! by placing the input on the 'left', and flipping it 'onto' the right
-    implicit none
-
     integer(i8), intent(in)              :: num
     integer(i8)                          :: i, n, palindrome
     integer,                 allocatable :: num_array(:), pal_array(:)
 
     ! use log10 to work out the number of digits in input
     ! palindrome will be twice as long
-    n = ceiling( log10(real(num,dp)) )
+    n = ceiling( log10(real(num,dp)), i8)
     ! convert input number into digitwise array, each digit can be of default integer kind rather than long (i8)
     num_array = [( int(modulo( (num / 10**(n-i)) , 10_i8 )), i = 1,n )]
     ! create palindrome array by reversing the number array and appending to itself
     pal_array = [ num_array , num_array(n:1:-1) ]
     ! use powers of 10 to convert the array back into a number
-    palindrome = sum( [( pal_array(i) * 10**(2*n - i), i=1,2*n) ] )
-
+    palindrome = sum( [( pal_array(i) * 10**(2*n - i), i=1,2*n )] )
   end function Palindrome
 
   pure recursive function Remove_duplicates(entries) result(unique)
     ! condenses an input 1D integer array by removing duplicated adjacent entries
     ! especially useful when the input is already sorted
-    implicit none
-
     integer(i8), intent(in)              :: entries(:)
     integer(i8)                          :: occurs
     integer(i8),             allocatable :: unique(:)
@@ -317,7 +277,6 @@ contains
         unique = [ entries(1) ]
       end if
     end if
-
   end function Remove_duplicates
 
   pure recursive function Qsort(unsorted) result(sorted)
@@ -327,8 +286,6 @@ contains
     ! masks the entries into 2 arrays (< or >= the pivot's value) using PACK
     ! sorts the resulting arrays recursively until each contain only 1 element
     ! recombine into output array using F2003/8 allocate-on-assignment
-    implicit none
-
     integer(i8), intent(in)              :: unsorted(:)
     integer(i8),             allocatable :: sorted(:)
 
@@ -338,17 +295,13 @@ contains
       sorted = [ Qsort(pack( unsorted(2:), unsorted(2:) < unsorted(1) )), unsorted(1), &
                  Qsort(pack( unsorted(2:), unsorted(2:) >= unsorted(1) )) ]
     end if
-
   end function Qsort
 
   pure function Lowest_common_multiple(divisors)
     ! returns the lowest common multiple of all the integers in the array 'divisors'
-    !
     ! TODO: reduce the need to effectively compute Prime_factors twice for each divisor
     ! could use a derived-type array to store all the factors the first time round, then just parse that
     ! or adapt the routine to use all the primes up to sqrt(maxval(divisors)), rather than only the primes which factorise
-    implicit none
-
     integer(i8), intent(in)              :: divisors(:)
     integer(i8)                          :: Lowest_common_multiple, i, j
     integer(i8),             allocatable :: primes(:), primes_section(:), wheel(:), factors(:), powers(:)
@@ -370,15 +323,13 @@ contains
       end do
     end do
     Lowest_common_multiple = product( primes ** powers ) ! raise to power element-wise
-
   end function Lowest_common_multiple
 
   recursive function Collatz(n, lengths, memoise) result(coll)
     ! return the length of the Collatz sequence starting at input 'n'
     ! uses a memoisation array 'lengths' to take advantage of precomputed lengths for other values of n
     ! this routine can memoise as it runs, but only if the optional 'memoise' argument is set to .true.
-    implicit none
-
+    ! TODO: to be brutally honest, the mere presence of the `lengths` array should indicate that we want to memoise...
     integer(i8), intent(in)              :: n
     integer(i8), intent(inout)           :: lengths(:)
     logical,     intent(in)   , optional :: memoise
@@ -418,7 +369,6 @@ contains
         if (n <= size(lengths)) lengths(n) = coll
       end if
     end if
-
   end function Collatz
 
 

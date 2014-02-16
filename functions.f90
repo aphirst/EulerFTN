@@ -299,24 +299,16 @@ contains
 
   pure function Lowest_common_multiple(divisors)
     ! returns the lowest common multiple of all the integers in the array 'divisors'
-    ! TODO: reduce the need to effectively compute Prime_factors twice for each divisor
-    ! could use a derived-type array to store all the factors the first time round, then just parse that
-    ! or adapt the routine to use all the primes up to sqrt(maxval(divisors)), rather than only the primes which factorise
     integer(i8), intent(in)              :: divisors(:)
     integer(i8)                          :: Lowest_common_multiple, i, j
-    integer(i8),             allocatable :: primes(:), primes_section(:), wheel(:), factors(:), powers(:)
+    integer(i8),             allocatable :: primes(:), wheel(:), factors(:), powers(:)
 
-    ! must create a separate subsection of the primes array for the actual act of factorisation
-    ! otherwise the generated wheel will be far, far too large
-    primes_section = [2,3,5]
-    wheel = Primes_wheel(primes_section)
-    ! we break apart each 'divisor' into its prime factors, combine all of divisors' factors into a list
-    ! then we sort it, and remove duplicate prime factors
-    primes = Remove_duplicates(Qsort( [( Prime_factors(divisors(i), primes_section, wheel), i=1,size(divisors) )] ))
+    primes = Primes_sieve( maxval(divisors) )
+    wheel = Primes_wheel( primes(1:3) )
     powers = [( 0_i8, i = 1, size(primes) )] ! currently have to specify KIND of 0, GCC bug #58750
     ! for each 'divisor', check how many times each prime factor occurs
     do i = 1, size(divisors)
-      factors = Prime_factors(divisors(i), primes_section, wheel)
+      factors = Prime_factors(divisors(i), primes(1:3), wheel)
       ! for each prime factor, keep only the MAXIMUM number of times the prime factor occurs in any member of divisors
       do concurrent ( j = 1:size(primes) )
         powers(j) = max( int(count(factors == primes(j)),i8) , powers(j) )

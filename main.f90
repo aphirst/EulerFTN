@@ -29,21 +29,21 @@ program EulerFTN
   case (0)
     stop 'Help not yet implemented. Sorry.'
   case (1)
-    call Problem_1
+    call Problem_01
   case (2)
-    call Problem_2
+    call Problem_02
   case (3)
-    call Problem_3
+    call Problem_03
   case (4)
-    call Problem_4
+    call Problem_04
   case (5)
-    call Problem_5
+    call Problem_05
   case (6)
-    call Problem_6
+    call Problem_06
   case (7)
-    call Problem_7
+    call Problem_07
   case (8)
-    call Problem_8
+    call Problem_08
   case (10)
     call Problem_10
   case (14)

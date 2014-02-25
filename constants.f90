@@ -18,7 +18,7 @@ module Constants
   implicit none
 
   integer,  parameter :: dp = selected_real_kind(15, 307) ! 15 digits of precision, exponent range of 307
-  integer,  parameter :: i8 = selected_int_kind(18) ! (signed) integer up to 10^18
+  integer,  parameter :: long = selected_int_kind(18) ! (signed) integer up to 10^18
   real(dp), parameter :: varphi = 0.5_dp + (0.5_dp)*sqrt(5.0_dp)
 
 end module Constants

@@ -200,7 +200,55 @@ contains
   end subroutine Problem_07
 
  subroutine Problem_08
+    ! Find the greatest product of five consecutive digits in the 1000-digit number.
+    integer, allocatable :: numbers(:)
+    integer              :: lines = 20, linewidth = 50, i, max_product = 1
+    real                 :: time(2)
+
+    print *, 'Problem #8: What is the greatest product of 5 consecutive numbers in the 1000-digit number in file <INPUT>?'
+    ! load the file into an array of integers
+    print *, 'Default: number stored in "problem8.txt" with 50 numbers per line.'
+    open(5, file='problem_08.txt', status='old')
+    ! 50 integers per line, 20 lines, no spaces
+    call cpu_time(time(1))
+    allocate(numbers(lines*linewidth))
+    do i = 1,lines
+      read(5,'(*(i1))') numbers(linewidth*i-linewidth+1:linewidth*i)
+    end do
+    close(5)
+    do i = 1, size(numbers)-4
+      max_product = max(max_product, product(numbers(i:i+4)))
+    end do
+    call cpu_time(time(2))
+    print '(a,i0)', 'The greatest product of 5 consecutive numbers is ',max_product
+    print '(a,f0.3,a)', 'Took: ',time(2)-time(1),' seconds'
   end subroutine Problem_08
+
+  subroutine Problem_09
+    ! There exists only one Pythagorean triplet for which `a+b+c=1000` Find the product `abc`.
+    integer(long) :: total, a, b, c
+    real          :: time(2)
+
+    print *, 'Problem #9: What is the product `abc`, where `a^2 + b^2 = c^2` (Pythagorean triplet) and `a + b + c = <INPUT>.'
+    print *, ''
+    print *, 'Please input the desired sum for `a+b+c`:'
+    read *, total
+    ! upper bound for `a` is `total/3` since `a < b < 3`, and it's the sum of *3* numbers...
+    outer: do a = 1, total/3
+      ! similarly for `b`, for the smallest `a` the sum `total` has to come from the remaining *2* numbers...
+      do b = a, total/2
+        ! clearly we know what `c` should be in each case
+        c = total - a - b
+        ! if the triplet is also Pythagorean, then we're done
+        if (a**2 + b**2 == c**2) then
+          exit outer
+        end if
+      end do
+    end do outer
+    print *, a, b, c, a+b+c, a*b*c
+    print '(a,i0)', 'The product of the triplet is ', a*b*c
+    print '(a,f0.3,a)', 'Took: ',time(2)-time(1),' seconds'
+  end subroutine Problem_09
 
   subroutine Problem_10
     ! The sum of the primes below 10 is 2 + 3 + 5 + 7 = 17.

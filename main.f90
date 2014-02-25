@@ -44,6 +44,8 @@ program EulerFTN
     call Problem_07
   case (8)
     call Problem_08
+  case (9)
+    call Problem_09
   case (10)
     call Problem_10
   case (14)

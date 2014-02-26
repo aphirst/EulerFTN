@@ -48,6 +48,10 @@ program EulerFTN
     call Problem_09
   case (10)
     call Problem_10
+  case (11)
+    call Problem_11
+  case (13)
+    call Problem_13
   case (14)
     call Problem_14
   case default

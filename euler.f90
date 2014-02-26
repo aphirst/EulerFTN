@@ -82,7 +82,7 @@ contains
     integer(long), allocatable :: primes(:), wheel(:), factors(:)
     real(dp)                   :: time(2)
 
-    print *, 'Problem #3: What is the largest prime factor of the number <INPUT>.'
+    print *, 'Problem #3: What is the largest prime factor of the number <INPUT>?'
     print *, ''
     print *, 'Please input the number to factorise:'
     read *, to_factorise
@@ -217,6 +217,7 @@ contains
     end do
     close(5)
     do i = 1, size(numbers)-4
+      if (any( numbers(i:i+4) == 0 )) cycle
       max_product = max(max_product, product(numbers(i:i+4)))
     end do
     call cpu_time(time(2))
@@ -229,10 +230,11 @@ contains
     integer(long) :: total, a, b, c
     real          :: time(2)
 
-    print *, 'Problem #9: What is the product `abc`, where `a^2 + b^2 = c^2` (Pythagorean triplet) and `a + b + c = <INPUT>.'
+    print *, 'Problem #9: What is the product `abc`, where `a^2 + b^2 = c^2` (Pythagorean triplet) and `a + b + c = <INPUT>?'
     print *, ''
     print *, 'Please input the desired sum for `a+b+c`:'
     read *, total
+    call cpu_time(time(1))
     ! upper bound for `a` is `total/3` since `a < b < 3`, and it's the sum of *3* numbers...
     outer: do a = 1, total/3
       ! similarly for `b`, for the smallest `a` the sum `total` has to come from the remaining *2* numbers...
@@ -245,6 +247,7 @@ contains
         end if
       end do
     end do outer
+    call cpu_time(time(2))
     print *, a, b, c, a+b+c, a*b*c
     print '(a,i0)', 'The product of the triplet is ', a*b*c
     print '(a,f0.3,a)', 'Took: ',time(2)-time(1),' seconds'
@@ -256,7 +259,7 @@ contains
     integer(long) :: n, the_sum
     real          :: time(2)
 
-    print *, 'Problem #10: Find the sum of all the primes below <INPUT>.'
+    print *, 'Problem #10: What is the sum of all the primes below <INPUT>?'
     print *, ''
     print *, 'Upper bound (exclusive)?'
     read *, n
@@ -266,6 +269,63 @@ contains
     print '(a,i0)', 'The sum is ',the_sum
     print '(a,f0.3,a)', 'Time: ',time(2)-time(1),' seconds'
   end subroutine Problem_10
+
+  subroutine Problem_11
+    ! In the 20x20 grid below, four numbers along a diagonal line have been marked in red.
+    ! The product of these numbers is 26 * 63 * 78 * 14 = 1788696.
+    ! What is the greatest product of four adjacent numbers in the same direction (including diagonally) in the 20x20 grid?
+    integer              :: width = 20, height = 20, i, j, k, temp(4), max_product = 0
+    integer, allocatable :: grid(:,:)
+    real                 :: time(2)
+
+    print *, 'What is the greatest product of four adjacent numbers (including diagonally) in the number grid in file <INPUT>?'
+    print *, 'Defaulting to 20x20 grid at "problem_11.txt".'
+    allocate(grid(height, width))
+    open(5, file='problem_11.txt', status='old')
+    ! we'll be naughty and load each row from the file into a column of the array, because it's quicker
+    ! in effect, we're storing the transpose of the grid
+    do i = 1, width
+      read(5,'(20(i3))') grid(:,i)
+    end do
+    close(5)
+    call cpu_time(time(1))
+    ! read horizontally
+    do i = 1, height
+      do j = 1, width-3
+        if (any( grid(i,j:j+3) == 0 )) cycle
+        max_product = max( max_product, product(grid(i,j:j+1)) )
+      end do
+    end do
+    ! read vertically
+    do i = 1, width
+      do j = 1, height-3
+        if (any( grid(j:j+3,i) == 0 )) cycle
+        max_product = max( max_product, product(grid(j:j+3,i)) )
+      end do
+    end do
+    ! read down-right diagonal
+    do i = 1, width-3
+      do j = 1, height-3
+        temp = [( grid(j+k,i+k), k=0,3 )]
+        if (any( temp == 0 )) cycle
+        max_product = max( max_product, product(temp) )
+      end do
+    end do
+    ! read up-right diagonal
+    do i = 1, width-3
+      do j = 4, height
+        temp = [( grid(j-k,i+k), k=0,3 )]
+        if (any( temp == 0 )) cycle
+        max_product = max( max_product, product(temp) )
+      end do
+    end do
+    call cpu_time(time(2))
+    print *, max_product
+    print '(a,f0.3,a)', 'Time: ',time(2)-time(1),' seconds'
+  end subroutine Problem_11
+
+  subroutine Problem_13
+  end subroutine Problem_13
 
   subroutine Problem_14
     ! Which starting number, under one million, produces the longest Collatz chain?
